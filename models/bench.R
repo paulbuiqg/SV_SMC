@@ -12,14 +12,14 @@ init.log.pdf = function(x, param=NULL) {
 }
 
 kernel.log.pdf = function(xprev, x, yprev=NULL, t.index=NULL, param=NULL) {
-  # Pdf of Markov kernel.
+  # Pdf of state Markov kernel.
   one.row = matrix(1, 1, length(x))
   m = xprev / 2 + 25 * xprev / (1 + xprev**2) + 8 * cos(1.2 * t.index)
   return(-0.5 * (t(one.row) %*% x - m %*% one.row)**2 / 10)
 }
 
 generate.kernel = function(xprev, yprev=NULL, t.index=NULL, param=NULL) {
-  # Generate Markov process from linear Gaussian kernel.
+  # Generate state Markov process.
   N = length(xprev)
   x = xprev / 2 + 25 * xprev / (1 + xprev**2) + 8 * cos(1.2 * t.index) +
     rnorm(N, 0, sqrt(10))
@@ -33,7 +33,6 @@ observation.log.pdf = function(y, x, t.index=NULL, param=NULL) {
 }
 
 generate.observation = function(N, x, t.index=NULL, param=NULL) {
-  # Generate observation.
   y = x**2 / 20 + rnorm(N, 0, 1)
   return(y)
 }
