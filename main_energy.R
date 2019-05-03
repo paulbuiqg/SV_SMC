@@ -80,7 +80,7 @@ data = na.trim(data, sides='both')
 data = na.locf(data)
 
 # in-sample starting time
-start.in = max(start.out - as.difftime(1096, units='days'), min(index(data)))
+start.in = max(start.out - len.train, min(index(data)))
 data.0 = data[index(data) >= start.in]
 
 forecast.index = index(data.0)[index(data.0) >= start.out]
