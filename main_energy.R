@@ -86,7 +86,7 @@ data.0 = data[index(data) >= start.in]
 forecast.index = index(data.0)[index(data.0) >= start.out]
 T.train = length(index(data.0)[index(data.0) < start.out])
 
-for (j in 4:ncol(data)) {
+for (j in 1:ncol(data)) {
   
   # model fitting, particle forecasting
   series = coredata(data.0[,j])
