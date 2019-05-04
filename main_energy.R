@@ -25,7 +25,7 @@ library(zoo)
 ### settings ###
 
 path = '/home/paul/code/SV_SMC/'
-model = 'SV'
+model = 'ASV'
 freq = 'month'
 
 # out-of-sample starting time
