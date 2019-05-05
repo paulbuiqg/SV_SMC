@@ -45,16 +45,19 @@ EM.algo <- function(y, param.init, param.inf, param.sup, N, Nth, maxiter, tol) {
   step.fail <- FALSE
   while (iter < maxiter && !step.fail) {
     iter <- iter + 1
-    tryCatch({
-      filter <- particle.filter(N, Nth, y, param);
-      smoother <- particle.smoother(filter$weights, filter$particles, param);
-      opti.res <- optimr(param, eval.minus.Q,
-                         y=y,
-                         wsmooth=smoother$weights,
-                         w2smooth=smoother$weights2,
-                         part=filter$particles,
-                         method="L-BFGS-B", lower=param.inf, upper=param.sup)},
-      error = function(e) {step.fail <<- TRUE; print('EM algorithm | error')})
+    tryCatch(
+      {
+        filter <- particle.filter(N, Nth, y, param);
+        smoother <- particle.smoother(filter$weights, filter$particles, param);
+        opti.res <- optimr(param, eval.minus.Q,
+                           y=y,
+                           wsmooth=smoother$weights,
+                           w2smooth=smoother$weights2,
+                           part=filter$particles,
+                           method="L-BFGS-B", lower=param.inf, upper=param.sup)
+      },
+      error = function(e) {step.fail <<- TRUE; print('EM algorithm | error')}
+    )
     print(sprintf('- EM algorithm | iteration %i', iter))
   }
   res.list <- list("param.seq"=param.seq, "param"=param)
