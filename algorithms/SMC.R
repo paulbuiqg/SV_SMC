@@ -169,7 +169,7 @@ run.experiment.SV = function(N, Nth, h, param.init, param.inf, param.sup,
   t = T.train
   
   # initial model fit
-  print(sprintf('- time index: %i', t))
+  print('model fit')
   em = EM.algo(y[1:t], param.init, param.inf, param.sup, N, Nth, maxiter.init, tol)
   param = em$param
   last.fit = 0
@@ -186,11 +186,11 @@ run.experiment.SV = function(N, Nth, h, param.init, param.inf, param.sup,
 
     t = t + 1
     last.fit = last.fit + 1
-    print(sprintf('- time index: %i', t))
+    print(sprintf('time %i', t))
 
     # re-fit model
     if (last.fit == fit.period) {
-      mean.y = mean(y[(t-T.train):t])
+      print('model re-fit')
       em = EM.algo(y[(t-T.train):t], param, param.inf, param.sup, N, Nth, maxiter, tol)
       param = em$param
       last.fit = 0
