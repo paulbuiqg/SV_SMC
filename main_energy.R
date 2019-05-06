@@ -25,7 +25,7 @@ library(zoo)
 ### settings ###
 
 path = '/home/paul/code/SV_SMC/'
-model = 'ASV'
+model = 'SV-M'
 freq = 'month'
 
 # out-of-sample starting time
@@ -87,7 +87,7 @@ forecast.index = index(data.0)[index(data.0) >= start.out]
 T.train = length(index(data.0)[index(data.0) < start.out])
 
 for (j in 1:ncol(data)) {
-  
+
   # model fitting, particle forecasting
   series = coredata(data.0[,j])
   param.init = initialize.parameters(series)
