@@ -169,7 +169,7 @@ run.experiment.SV = function(N, Nth, h, param.init, param.inf, param.sup,
   t = T.train
   
   # initial model fit
-  print('model fit')
+  print('model initial fit')
   em = EM.algo(y[1:t], param.init, param.inf, param.sup, N, Nth, maxiter.init, tol)
   param = em$param
   last.fit = 0
