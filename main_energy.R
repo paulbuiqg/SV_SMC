@@ -25,8 +25,8 @@ library(zoo)
 ### settings ###
 
 path = '/home/paul/code/SV_SMC/'
-model = 'SV-M-modified'
-freq = 'month'
+model = 'SV'
+freq = 'week'
 
 # out-of-sample starting time
 start.out = as.POSIXct('2000-01-01', origin='1970-01-01', tz='GMT')
