@@ -19,14 +19,14 @@
 # where Value-at-Risk is the quantile and Expected Shortfall is the mean of the returns exceeding the quantile.
 
 rm(list=ls())
-
+set.seed(99)
 library(zoo)
 
 ### settings ###
 
 path = '/home/paul/code/SV_SMC/'
 model = 'SV'
-freq = 'week'
+freq = 'month'
 
 # out-of-sample starting time
 start.out = as.POSIXct('2000-01-01', origin='1970-01-01', tz='GMT')
@@ -70,8 +70,8 @@ if (freq=='day') {
   assign('data', SPOT.wRet)
 } else if (freq=='month') {
   fit.period = 3
-  maxiter.init = 50
-  maxiter = 5
+  maxiter.init = 5#50
+  maxiter = 1#5
   assign('data', SPOT.mRet)
 }
 
