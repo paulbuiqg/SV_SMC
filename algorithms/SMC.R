@@ -212,19 +212,27 @@ run.experiment.SV = function(N, Nth, h, param.init, param.inf, param.sup,
 forecast.statistics = function(y, y.part) {
   "Compute statistics to assess distribution forecast performance."
   N = ncol(y.part)
-  probas = c(.01, 0.025, 0.05, 0.95, 0.975, 0.99)
   PIT = rowSums(y.part < y %*% matrix(1, 1, N)) / N
-  VaR = matrix(NA, length(y), length(probas))
-  ES = matrix(NA, length(y), length(probas))
+  probas.inf = c(.01, 0.025, 0.05)
+  probas.sup = c(.95, 0.975, 0.99)
+  VaR.inf = matrix(NA, length(y), length(probas.inf))
+  VaR.sup = matrix(NA, length(y), length(probas.sup))
+  ES.inf = matrix(NA, length(y), length(probas.inf))
+  ES.sup = matrix(NA, length(y), length(probas.sup))
   for (i in 1:length(y)) {
-    VaR[i,] = quantile(-y.part[i,], probs=probas)
-    for (j in 1:length(probas)) {
-      ES[i,j] = -mean(y.part[i, -y.part[i,] < VaR[i,j]])
+    VaR.inf[i,] = quantile(-y.part[i,], probs=probas.inf)
+    VaR.sup[i,] = quantile(-y.part[i,], probs=probas.sup)
+    for (j in 1:length(probas.inf)) {
+      ES.inf[i,j] = -mean(y.part[i, -y.part[i,] < VaR.inf[i,j]])
+    }
+    for (j in 1:length(probas.sup)) {
+      ES.sup[i,j] = -mean(y.part[i, -y.part[i,] > VaR.sup[i,j]])
     }
   }
-  res.list = list("PIT"=PIT, "VaR.01"=VaR[,1], "VaR.025"=VaR[,2],  "VaR.05"=VaR[,3],
-                  "VaR.95"=VaR[,4], "VaR.975"=VaR[,5], "VaR.99"=VaR[,6],
-                  "ES.01"=ES[,1], "ES.025"=ES[,2], "ES.05"=ES[,3],
-                  "ES.95"=ES[,4], "ES.975"=ES[,5], "ES.99"=ES[,6])
+  res.list = list("PIT"=PIT,
+                  "VaR.01"=VaR.inf[,1], "VaR.025"=VaR.inf[,2],  "VaR.05"=VaR.inf[,3],
+                  "VaR.95"=VaR.sup[,1], "VaR.975"=VaR.sup[,2], "VaR.99"=VaR.sup[,3],
+                  "ES.01"=ES.inf[,1], "ES.025"=ES.inf[,2], "ES.05"=ES.inf[,3],
+                  "ES.95"=ES.sup[,1], "ES.975"=ES.sup[,2], "ES.99"=ES.sup[,3])
   return(res.list)
 }
