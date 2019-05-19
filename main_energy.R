@@ -25,7 +25,7 @@ library(zoo)
 ### settings ###
 
 path = '/home/paul/code/SV_SMC/'
-model = 'SV'
+model = 'SV-M-modified'
 freq = 'month'
 
 # out-of-sample starting time
@@ -70,8 +70,8 @@ if (freq=='day') {
   assign('data', SPOT.wRet)
 } else if (freq=='month') {
   fit.period = 3
-  maxiter.init = 5#50
-  maxiter = 1#5
+  maxiter.init = 50
+  maxiter = 5
   assign('data', SPOT.mRet)
 }
 
