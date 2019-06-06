@@ -26,21 +26,6 @@ EM.algo <- function(y, param.init, param.inf, param.sup, N, Nth, maxiter, tol) {
   # The function Q to maximize is approximated by particle methods.
   param <- param.init
   param.seq <- c(param)
-  # for (k in 1:maxiter) {
-  #   filter = particle.filter(N, Nth, y, param)
-  #   smoother = particle.smoother(filter$weights, filter$particles, param)
-  #   opti.res = optimr(param, eval.minus.Q,
-  #                     y=y,
-  #                     wsmooth=smoother$weights,
-  #                     w2smooth=smoother$weights2,
-  #                     part=filter$particles,
-  #                     method="L-BFGS-B", lower=param.inf, upper=param.sup)
-  #   param = opti.res$par
-  #   param.seq = cbind(param.seq, param)
-  #   print(sprintf('- EM algorithm | iteration %i', k))
-  # }
-  # res.list = list("param.seq"=param.seq, "param"=param,
-  #                 "particles"=filter$particles, "weights"=filter$weights)
   iter <- 0
   step.fail <- FALSE
   while (iter < maxiter && !step.fail) {
@@ -55,9 +40,11 @@ EM.algo <- function(y, param.init, param.inf, param.sup, N, Nth, maxiter, tol) {
                            w2smooth=smoother$weights2,
                            part=filter$particles,
                            method="L-BFGS-B", lower=param.inf, upper=param.sup)
+        param = opti.res$par
       },
       error = function(e) {step.fail <<- TRUE; print('EM algorithm | error')}
     )
+    param.seq = cbind(param.seq, param)
     print(sprintf('- EM algorithm | iteration %i', iter))
   }
   res.list <- list("param.seq"=param.seq, "param"=param)
