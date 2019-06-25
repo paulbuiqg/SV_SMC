@@ -87,9 +87,8 @@ particle.filter.step = function(N, Nth, y, part, w, yprev=NULL, t.index=NULL,
     part = generate.kernel(part, yprev, t.index, param)
     wei = w * exp(observation.log.pdf(y, part, t.index, param))
   }
-  w = wei / sum(wei)
-  if (any(is.na(w)) | any(is.infinite(w))) {
-    print('NaN weights in particle filter.')
+  if (is.finite(1 / sum(wei))) {
+    w = wei / sum(wei)
   }
   res.list = list("particles"=part, "weights"=w)
   return(res.list)
@@ -115,50 +114,50 @@ compute.PIT = function(y, y.part) {
 
 run.experiment = function(N, Nth, T, h, param=NULL) {
   # Run experiment with simulated data.
-  
+
   x = numeric(T)
   y = numeric(T)
   y.part = matrix(NA, T, N)
-  
+
   ## initialization ##
-  
+
   # observe
   obs.init = observation.init(param)
   x[1] = obs.init$state
   y[1] = obs.init$observation
-  
+
   # filter
   part.init = particle.filter.init(N, y[1], param)
   part = part.init$particles
   w = part.init$weights
-  
+
   ## time loop ##
-  
+
   t = 1
   s = h + 1
   while (t <= T - h) {
-    
+
     # forecast
     y.part[s,] = particle.forecast(N, part, w, h, y[t], t, param)
-    
+
     t = t + 1
     s = s + 1
-    
+
     # observe
     obs.step = observation.step(x[t-1], y[t-1], t, param)
     x[t] = obs.step$state
     y[t] = obs.step$observation
-    
+
     # one-step filter
     part.step = particle.filter.step(N, Nth, y[t], part, w, y[t-1], t, param)
     part = part.step$particles
     w = part.step$weights
-    
+
   }
-  
+
   res.list = list("observations"=y, "observation.particles"=y.part)
   return(res.list)
-  
+
 }
 
 run.experiment.SV = function(N, Nth, h, param.init, param.inf, param.sup,
@@ -167,13 +166,13 @@ run.experiment.SV = function(N, Nth, h, param.init, param.inf, param.sup,
 
   T = length(y)
   t = T.train
-  
+
   # initial model fit
   print('model initial fit')
   em = EM.algo(y[1:t], param.init, param.inf, param.sup, N, Nth, maxiter.init, tol)
   param = em$param
   last.fit = 0
-  
+
   # initial particle filter
   filter = particle.filter(N, Nth, y[1:t], param)
   part = filter$particles[t,]
@@ -203,7 +202,7 @@ run.experiment.SV = function(N, Nth, h, param.init, param.inf, param.sup,
 
     # forecast
     y.part = rbind(y.part, particle.forecast(N, part, w, h, y[t], NULL, param))
-    
+
   }
 
   return(y.part)
