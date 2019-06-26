@@ -87,8 +87,12 @@ particle.filter.step = function(N, Nth, y, part, w, yprev=NULL, t.index=NULL,
     part = generate.kernel(part, yprev, t.index, param)
     wei = w * exp(observation.log.pdf(y, part, t.index, param))
   }
-  if (is.finite(1 / sum(wei))) {
-    w = wei / sum(wei)
+  tryCatch(
+    {w = wei / sum(wei)},
+    error = function(e) {print('Particle filter | error')}
+  )
+  if (any(is.infinite(w)) || any(is.nan(w))) {
+    w = wprev
   }
   res.list = list("particles"=part, "weights"=w)
   return(res.list)
