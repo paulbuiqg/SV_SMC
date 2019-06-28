@@ -33,9 +33,9 @@ particle.filter = function(N, Nth, y, param=NULL) {
   T = length(y)
   part = matrix(0, T, N)
   w = matrix(0, T, N)
-  part[1,] = generate.init(N, param)
-  wei = exp(observation.log.pdf(y[1], part[1,], 1, param))
-  w[1,] = wei / sum(wei)
+  init = particle.filter.init(N, y[1], param)
+  part[1,] = init$particles
+  w[1,] = init$weights
   t = 2
   while (t <= T) {
     step = particle.filter.step(N, Nth, y[t], part[t-1,], w[t-1,], y[t-1], t, param)
@@ -70,7 +70,11 @@ particle.filter.init = function(N, y, param=NULL) {
   # Particle filter initialization.
   part = generate.init(N, param)
   wei = exp(observation.log.pdf(y, part, 1, param))
-  w = wei / sum(wei)
+  if (weights.ok(wei)) {
+    w = wei / sum(wei)
+  } else {
+    w = rep(1/N, N)
+  }
   res.list = list("particles"=part, "weights"=w)
   return(res.list)
 }
@@ -87,16 +91,27 @@ particle.filter.step = function(N, Nth, y, part, w, yprev=NULL, t.index=NULL,
     part = generate.kernel(part, yprev, t.index, param)
     wei = w * exp(observation.log.pdf(y, part, t.index, param))
   }
-  if (any(is.infinite(w)) || any(is.nan(w))) {
-    w = wprev
-    print('Particle filter | error | NaN or Inf weight')
-  }
-  if (sum(wei)==0) {
-    w = wprev
-    print('Particle filter | error | zero weight sum')
+  if (weights.ok(wei)) {
+    w = wei / sum(wei)
   }
   res.list = list("particles"=part, "weights"=w)
   return(res.list)
+}
+
+weights.ok = function(wei) {
+  # Check if weights are real numbers.
+  if (sum(wei)==0) {
+    print('Particle filter | error | zero weight sum')
+    return(FALSE)
+  } else {
+    w = wei / sum(wei)
+  }
+  if (any(is.infinite(w)) || any(is.nan(w))) {
+    print('Particle filter | error | NaN or Inf weight')
+    return(FALSE)
+  } else {
+    return(TRUE)
+  }
 }
 
 particle.forecast = function(N, part, w, h, yprev, t.index=NULL, param=NULL) {
