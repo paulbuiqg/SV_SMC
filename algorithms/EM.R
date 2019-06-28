@@ -40,12 +40,14 @@ EM.algo <- function(y, param.init, param.inf, param.sup, N, Nth, maxiter, tol) {
                            w2smooth=smoother$weights2,
                            part=filter$particles,
                            method="L-BFGS-B", lower=param.inf, upper=param.sup)
-        param = opti.res$par
-        param.seq = cbind(param.seq, param)
-        print(sprintf('- EM algorithm | iteration %i', iter))
       },
       error = function(e) {step.fail <<- TRUE; print('EM algorithm | error')}
     )
+    if (!step.fail) {
+      param = opti.res$par
+      param.seq = cbind(param.seq, param)
+      print(sprintf('- EM algorithm | iteration %i', iter))
+    } else break
   }
   res.list <- list("param.seq"=param.seq, "param"=param)
   return(res.list)
