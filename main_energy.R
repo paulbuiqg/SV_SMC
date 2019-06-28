@@ -1,3 +1,4 @@
+
 # SPOT – are the Spot prices
 # SPOT.dRet – are daily returns in the period 1997-2017
 # SPOT.wRet – are weekly returns in the period 1997-2017
@@ -30,8 +31,8 @@ library(zoo)
 
 path = '/home/paul/code/SV_SMC/'
 model = 'ASV'
-freq = 'month'
-asset = 'Brent'
+freq = 'week'
+asset = 'WTI'
 
 # out-of-sample starting time
 start.out = as.POSIXct('2000-01-01', origin='1970-01-01', tz='GMT')
