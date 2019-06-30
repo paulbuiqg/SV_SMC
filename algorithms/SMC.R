@@ -102,7 +102,7 @@ normalize.weights = function(wei, wprev) {
     {
       w = wei / sum(wei)
     },
-    error = function(e) {print('Particle filter | error | weight normalization'), return(wprev)}
+    error = function(e) {print('Particle filter | error | weight normalization'); return(wprev)}
   )
   if (any(is.infinite(w)) || any(is.nan(w))) {
     print('Particle filter | error | NaN or Inf weight')
