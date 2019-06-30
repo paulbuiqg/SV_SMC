@@ -70,11 +70,7 @@ particle.filter.init = function(N, y, param=NULL) {
   # Particle filter initialization.
   part = generate.init(N, param)
   wei = exp(observation.log.pdf(y, part, 1, param))
-  if (weights.ok(wei)) {
-    w = wei / sum(wei)
-  } else {
-    w = rep(1/N, N)
-  }
+  w = normalize.weights(wei, rep(1/N, N))  
   res.list = list("particles"=part, "weights"=w)
   return(res.list)
 }
@@ -91,26 +87,28 @@ particle.filter.step = function(N, Nth, y, part, w, yprev=NULL, t.index=NULL,
     part = generate.kernel(part, yprev, t.index, param)
     wei = w * exp(observation.log.pdf(y, part, t.index, param))
   }
-  if (weights.ok(wei)) {
-    w = wei / sum(wei)
-  }
+  w = normalize.weights(wei, w)
   res.list = list("particles"=part, "weights"=w)
   return(res.list)
 }
 
-weights.ok = function(wei) {
-  # Check if weights are real numbers.
-  if (sum(wei)==0) {
-    print('Particle filter | error | zero weight sum')
-    return(FALSE)
-  } else {
-    w = wei / sum(wei)
+normalize.weights = function(wei, wprev) {
+  # Normalize weights.
+  if (any(is.infinite(wei)) || any(is.nan(wei))) {
+    print('Particle filter | error | NaN or Inf weight')
+    return(wprev)
   }
+  tryCatch(
+    {
+      w = wei / sum(wei)
+    },
+    error = function(e) {print('Particle filter | error | weight normalization'), return(wprev)}
+  )
   if (any(is.infinite(w)) || any(is.nan(w))) {
     print('Particle filter | error | NaN or Inf weight')
-    return(FALSE)
+    return(wprev)
   } else {
-    return(TRUE)
+    return(w)
   }
 }
 
