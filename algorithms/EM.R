@@ -42,7 +42,7 @@ EM.algo <- function(y, param.init, param.inf, param.sup, N, Nth, maxiter, tol) {
       },
       error = function(e) {print('EM algorithm | error'); break}
     )
-    if (is.finite(param)) {
+    if (all(is.finite(param))) {
       param = opti.res$par
       param.seq = cbind(param.seq, param)
       print(sprintf('- EM algorithm | iteration %i', iter))
