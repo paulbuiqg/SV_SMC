@@ -227,7 +227,7 @@ run.experiment.SV = function(N, Nth, h, param.init, param.inf, param.sup,
 }
 
 forecast.statistics = function(y, y.part) {
-  "Compute statistics to assess distribution forecast performance."
+  # Compute statistics to assess distribution forecast performance.
   N = ncol(y.part)
   PIT = rowSums(y.part < y %*% matrix(1, 1, N)) / N
   probas.inf = c(.01, 0.025, 0.05)
