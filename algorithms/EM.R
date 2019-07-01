@@ -27,8 +27,7 @@ EM.algo <- function(y, param.init, param.inf, param.sup, N, Nth, maxiter, tol) {
   param <- param.init
   param.seq <- c(param)
   iter <- 0
-  step.fail <- FALSE
-  while (iter < maxiter && !step.fail) {
+  while (iter < maxiter) {
     iter <- iter + 1
     tryCatch(
       {
@@ -41,13 +40,16 @@ EM.algo <- function(y, param.init, param.inf, param.sup, N, Nth, maxiter, tol) {
                            part=filter$particles,
                            method="L-BFGS-B", lower=param.inf, upper=param.sup)
       },
-      error = function(e) {step.fail <<- TRUE; print('EM algorithm | error')}
+      error = function(e) {print('EM algorithm | error'); break}
     )
-    if (!step.fail) {
+    if (is.finite(param)) {
       param = opti.res$par
       param.seq = cbind(param.seq, param)
       print(sprintf('- EM algorithm | iteration %i', iter))
-    } else break
+    } else {
+      print('EM algorithm | error | NaN of Inf parameter')
+      break
+    }
   }
   res.list <- list("param.seq"=param.seq, "param"=param)
   return(res.list)
