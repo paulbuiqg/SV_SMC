@@ -14,7 +14,7 @@ n.xp = 100
 T = 1000
 
 N.grid = c(50, 100, 200, 400)
-h = 1
+h = 5
 
 box.pvals = matrix(NA, length(N.grid), n.xp)
 box.stats = matrix(NA, length(N.grid), n.xp)
@@ -44,16 +44,16 @@ par(mfrow=c(2, 2), oma=c(0, 0, 2, 0))
 xgrid = seq(-1, 10, .01)
 plot(ecdf(box.stats[1,]), xlim=c(-1, 10),
      xlab='Test statistic', ylab='ECDF', main=sprintf('N=%i', N.grid[1]))
-lines(xgrid, pchisq(xgrid, 1), col='blue')
+lines(xgrid, pchisq(xgrid, 1))
 plot(ecdf(box.stats[2,]), xlim=c(-1, 10),
      xlab='Test statistic', ylab='ECDF', main=sprintf('N=%i', N.grid[2]))
-lines(xgrid, pchisq(xgrid, 1), col='blue')
+lines(xgrid, pchisq(xgrid, 1))
 plot(ecdf(box.stats[3,]), xlim=c(-1, 10),
      xlab='Test statistic', ylab='ECDF', main=sprintf('N=%i', N.grid[3]))
-lines(xgrid, pchisq(xgrid, 1), col='blue')
+lines(xgrid, pchisq(xgrid, 1))
 plot(ecdf(box.stats[4,]), xlim=c(-1, 10),
      xlab='Test statistic', ylab='ECDF', main=sprintf('N=%i', N.grid[4]))
-lines(xgrid, pchisq(xgrid, 1), col='blue')
+lines(xgrid, pchisq(xgrid, 1))
 mtext(sprintf('Ljung-Box test - %i-step ahead forecast', h), outer=TRUE)
 
 library(kolmim)
@@ -63,14 +63,14 @@ ygrid = numeric(length(xgrid))
 for (i in 1:length(ygrid)) {ygrid[i] = pkolm(xgrid[i], n)}
 plot(ecdf(ks.stats[1,]), xlim=c(min(xgrid), max(xgrid)),
      xlab='Test statistic', ylab='ECDF', main=sprintf('N=%i', N.grid[1]))
-lines(xgrid, ygrid, col='blue')
+lines(xgrid, ygrid)
 plot(ecdf(ks.stats[2,]), xlim=c(min(xgrid), max(xgrid)),
      xlab='Test statistic', ylab='ECDF', main=sprintf('N=%i', N.grid[2]))
-lines(xgrid, ygrid, col='blue')
+lines(xgrid, ygrid)
 plot(ecdf(ks.stats[3,]), xlim=c(min(xgrid), max(xgrid)),
      xlab='Test statistic', ylab='ECDF', main=sprintf('N=%i', N.grid[3]))
-lines(xgrid, ygrid, col='blue')
+lines(xgrid, ygrid)
 plot(ecdf(ks.stats[4,]), xlim=c(min(xgrid), max(xgrid)),
      xlab='Test statistic', ylab='ECDF', main=sprintf('N=%i', N.grid[4]))
-lines(xgrid, ygrid, col='blue')
+lines(xgrid, ygrid)
 mtext(sprintf('Kolmogorov-Smirnov test - %i-step ahead forecast', h), outer=TRUE)

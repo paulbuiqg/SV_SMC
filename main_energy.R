@@ -31,8 +31,8 @@ library(zoo)
 
 path = '/home/paul/code/SV_SMC/'
 model = 'ASV'
-freq = 'week'
-asset = 'WTI'
+freq = 'day'
+asset = 'Brent'
 
 # out-of-sample starting time
 start.out = as.POSIXct('2000-01-01', origin='1970-01-01', tz='GMT')
