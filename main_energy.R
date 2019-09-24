@@ -29,10 +29,10 @@ library(zoo)
 
 ### settings ###
 
-path = '/home/paul/code/SV_SMC/'
+path = paste(getwd(), '/', sep='')
 model = 'ASV'
 freq = 'day'
-asset = 'Brent'
+asset = 'WTI'
 
 # out-of-sample starting time
 start.out = as.POSIXct('2000-01-01', origin='1970-01-01', tz='GMT')
