@@ -32,7 +32,7 @@ EM.algo <- function(y, param.init, param.inf, param.sup, N, Nth, maxiter, tol) {
     tryCatch(
       {
         filter <- particle.filter(N, Nth, y, param);
-        smoother <- particle.smoother(filter$weights, filter$particles, param);
+        smoother <- particle.smoother(filter$weights, filter$particles, y, param);
         opti.res <- optimr(param, eval.minus.Q,
                            y=y,
                            wsmooth=smoother$weights,
