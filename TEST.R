@@ -23,7 +23,7 @@ plot(y, type="l")
 filter = particle.filter(100, 66, y, param.test)
 x.filt = rowSums(filter$particles * filter$weights)
 
-smoother = particle.smoother(filter$weights, filter$particles, param.test)
+smoother = particle.smoother(filter$weights, filter$particles, y, param.test)
 x.smooth = rowSums(filter$particles * smoother$weights)
 
 plot(x, type="l")
