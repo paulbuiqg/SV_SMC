@@ -69,7 +69,7 @@ deriv2.kernel.log.pdf = function(xprev, x, yprev, t.index, param) {
   s2 = param[4]**2
   deriv.m = matrix(c(0, 0, xprev, 0), nrow=1)
   deriv.s2 = matrix(c(0, 0, 0, 2 * param[4]), nrow=1)
-  deriv2.m = matrix(0, nrow=4, nrow=4)
+  deriv2.m = matrix(0, nrow=4, ncol=4)
   deriv2.s2 = matrix(c(0, 0, 0, 0,
                        0, 0, 0, 0,
           					   0, 0, 0, 0,
@@ -112,7 +112,7 @@ deriv2.observation.log.pdf = function(y, x, t.index, param) {
   s2 = param[2]**2 * exp(x)
   deriv.m = matrix(c(1, 0, 0, 0), nrow=1)
   deriv.s2 = matrix(c(0, 2 * param[2] * exp(x), 0, 0), nrow=1)
-  deriv2.m = matrix(0, nrow=4, nrow=4)
+  deriv2.m = matrix(0, nrow=4, ncol=4)
   deriv2.s2 = matrix(c(0, 0, 0, 0,
                        0, 2 * exp(x), 0, 0,
 		          			   0, 0, 0, 0,
