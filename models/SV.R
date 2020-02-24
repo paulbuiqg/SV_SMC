@@ -34,14 +34,14 @@ deriv.init.log.pdf = function(x, param) {
 deriv2.init.log.pdf = function(x, param) {
   # 2nd derivative of initial state pdf.
   m = 0
-  s2 = (param[4] / sqrt(1 - param[3]**2))**2
-  deriv.s2 = matrix(c(0, 0, 2 * param[4]**2 * param[3] / (1 - param[3]**2)**4, 2 * param[4] / (1 - param[3]**2)), nrow=1)
+  s2 = param[4]**2 / (1 - param[3]**2)
+  deriv.s2 = matrix(c(0, 0, 2 * param[3] * param[4]**2 / (1 - param[3]**2)**2, 2 * param[4] / (1 - param[3]**2)), nrow=1)
   deriv2.s2 = matrix(c(0, 0, 0, 0,
                        0, 0, 0, 0,
-		          			   0, 0, 2 * param[4]**2/ (1 - param[3]**2)**2 + 8 * param[3]**2 * param[4]**2 / (1 - param[3]**2)**3, 4 * param[3] * param[4] / (1 - param[3]**2)**2,
+		          			   0, 0, 2 * param[4]**2 / (1 - param[3]**2)**2 + 8 * param[3]**2 * param[4]**2 / (1 - param[3]**2)**3, 4 * param[3] * param[4] / (1 - param[3]**2)**2,
 					             0, 0, 4 * param[3] * param[4] / (1 - param[3]**2)**2, 2 / (1 - param[3]**2)), nrow=4)
   return(-0.5 * deriv2.s2 / s2 + 0.5 * t(deriv.s2) %*% deriv.s2 / s2**2                           # -0.5 * deriv.s2 / s2
-         + 0.5 * deriv2.s2 * (x - m)**2 / s2**2 - t(deriv.s2) %*% deriv.s2 * (x - m)**2 / s2**4)  # 0.5 * deriv.s2 * (x - m)**2 / s2**2
+         + 0.5 * deriv2.s2 * (x - m)**2 / s2**2 - t(deriv.s2) %*% deriv.s2 * (x - m)**2 / s2**3)  # 0.5 * deriv.s2 * (x - m)**2 / s2**2
 }
 
 kernel.log.pdf = function(xprev, x, yprev, t.index, param) {
@@ -75,9 +75,9 @@ deriv2.kernel.log.pdf = function(xprev, x, yprev, t.index, param) {
           					   0, 0, 0, 0,
 					             0, 0, 0, 2), nrow=4)
   return(-0.5 * deriv2.s2 / s2 + 0.5 * t(deriv.s2) %*% deriv.s2 / s2**2                          # -0.5 * deriv.s2 / s2
-         + 0.5 * deriv2.s2 * (x - m)**2 / s2**2 - t(deriv.s2) %*% deriv.s2 * (x - m)**2 / s2**4  # 0.5 * deriv.s2 * (x - m)**2 / s2**2 (w.r.t. s2)
-         - t(deriv.m) %*% deriv.s2 * (x - m) / s2**2                                             # 0.5 * deriv.s2 * (x - m)**2 / s2**2 (w.r.t. m)
-         - t(deriv.s2) %*% deriv.m * (x - m) / s2**2                                             # deriv.m * (x - m) / s2) (w.r.t. s2)
+         + 0.5 * deriv2.s2 * (x - m)**2 / s2**2 - t(deriv.s2) %*% deriv.s2 * (x - m)**2 / s2**3  # 0.5 * deriv.s2 * (x - m)**2 / s2**2 (w.r.t. s2)
+         - t(deriv.s2) %*% deriv.m * (x - m) / s2**2                                             # 0.5 * deriv.s2 * (x - m)**2 / s2**2 (w.r.t. m)
+         - t(deriv.m) %*% deriv.s2 * (x - m) / s2**2                                             # deriv.m * (x - m) / s2) (w.r.t. s2)
          + deriv2.m * (x - m) / s2 - t(deriv.m) %*% deriv.m / s2)                                # deriv.m * (x - m) / s2)
 }
 
@@ -118,9 +118,9 @@ deriv2.observation.log.pdf = function(y, x, t.index, param) {
 		          			   0, 0, 0, 0,
 					             0, 0, 0, 0), nrow=4)
   return(-0.5 * deriv2.s2 / s2 + 0.5 * t(deriv.s2) %*% deriv.s2 / s2**2                          # -0.5 * deriv.s2 / s2
-         + 0.5 * deriv2.s2 * (y - m)**2 / s2**2 - t(deriv.s2) %*% deriv.s2 * (y - m)**2 / s2**4  # 0.5 * deriv.s2 * (y - m)**2 / s2**2 (w.r.t. s2) 
+         + 0.5 * deriv2.s2 * (y - m)**2 / s2**2 - t(deriv.s2) %*% deriv.s2 * (y - m)**2 / s2**3  # 0.5 * deriv.s2 * (y - m)**2 / s2**2 (w.r.t. s2) 
          - t(deriv.s2) %*% deriv.m * (y - m) / s2**2                                             # 0.5 * deriv.s2 * (y - m)**2 / s2**2 (w.r.t. m) 
-         - t(deriv.s2) %*% deriv.m * (y - m) / s2**2                                             # deriv.m * (y - m) / s2 (w.r.t. s2)
+         - t(deriv.m) %*% deriv.s2 * (y - m) / s2**2                                             # deriv.m * (y - m) / s2 (w.r.t. s2)
          + deriv2.m * (y - m) / s2 - t(deriv.m) %*% deriv.m / s2)                                # deriv.m * (y - m) / s2 (w.r.t. m)
 }
 
