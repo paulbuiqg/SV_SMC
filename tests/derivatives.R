@@ -16,17 +16,17 @@ t.index = 1
 
 eps = .001
 
-# fun = function(param) {init.log.pdf(x, param)}
-# deriv.fun = function(param) {deriv.init.log.pdf(x, param)}
-# deriv2.fun = function(param) {deriv2.init.log.pdf(x, param)}
+fun = function(param) {init.log.pdf(x, param)}
+deriv.fun = function(param) {deriv.init.log.pdf(x, param)}
+deriv2.fun = function(param) {deriv2.init.log.pdf(x, param)}
 
 # fun = function(param) {kernel.log.pdf(xprev, x, yprev, t.index, param)}
 # deriv.fun = function(param) {deriv.kernel.log.pdf(xprev, x, yprev, t.index, param)}
 # deriv2.fun = function(param) {deriv2.kernel.log.pdf(xprev, x, yprev, t.index, param)}
 
-fun = function(param) {observation.log.pdf(y, x, t.index, param)}
-deriv.fun = function(param) {deriv.observation.log.pdf(y, x, t.index, param)}
-deriv2.fun = function(param) {deriv2.observation.log.pdf(y, x, t.index, param)}
+# fun = function(param) {observation.log.pdf(y, x, t.index, param)}
+# deriv.fun = function(param) {deriv.observation.log.pdf(y, x, t.index, param)}
+# deriv2.fun = function(param) {deriv2.observation.log.pdf(y, x, t.index, param)}
 
 approx.deriv = function(fun, param, eps) {
   res = numeric(length(param))

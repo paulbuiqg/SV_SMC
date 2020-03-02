@@ -25,7 +25,7 @@ deriv.init.log.pdf = function(x, param) {
   # Derivative of initial state pdf.
   m = 0
   s2 = param[4]**2 / (1 - param[3]**2)
-  deriv.s2 = c(0, 0, 2 * param[3] * param[4]**2 / (1 - param[3]**2)**2, 2 * param[4] / (1 - param[3]**2))
+  deriv.s2 = rep(1, length(param)) %*% t(as.matrix(c(0, 0, 2 * param[3] * param[4]**2 / (1 - param[3]**2)**2, 2 * param[4] / (1 - param[3]**2))))
   return(-0.5 * deriv.s2 / s2                   # -0.5 * log(s2)
          + 0.5 * deriv.s2 * (x - m)**2 / s2**2  # -0.5 * (x - m)**2 / s2)
   )
@@ -58,6 +58,17 @@ deriv.kernel.log.pdf = function(xprev, x, yprev, t.index, param) {
   s2 = param[4]**2
   deriv.m = c(0, 0, xprev, 0)
   deriv.s2 = c(0, 0, 0, 2 * param[4])
+  return(-0.5 * deriv.s2 / s2                   # -0.5 * log(s2)
+         + 0.5 * deriv.s2 * (x - m)**2 / s2**2  # -0.5 * (t(one.row) %*% x - m %*% one.row)**2 / s2 (w.r.t. s2)
+         + deriv.m * (x - m) / s2)              # -0.5 * (t(one.row) %*% x - m %*% one.row)**2 / s2 (w.r.t. m)
+}
+
+deriv.kernel.log.pdf = function(xprev, x, yprev, t.index, param) {
+  # Derivative of state Markov kernel pdf.
+  m = param[3] * xprev
+  s2 = param[4]**2
+  deriv.m = c(0, 0, xprev, 0) %*% rep(1, length(param))
+  deriv.s2 = c(0, 0, 0, 2 * param[4]) %*% t(rep(1, length(param)))
   return(-0.5 * deriv.s2 / s2                   # -0.5 * log(s2)
          + 0.5 * deriv.s2 * (x - m)**2 / s2**2  # -0.5 * (t(one.row) %*% x - m %*% one.row)**2 / s2 (w.r.t. s2)
          + deriv.m * (x - m) / s2)              # -0.5 * (t(one.row) %*% x - m %*% one.row)**2 / s2 (w.r.t. m)
@@ -99,8 +110,8 @@ deriv.observation.log.pdf = function(y, x, t.index, param) {
   # Derivative of observation distribution pdf.
   m = param[1]
   s2 = param[2]**2 * exp(x)
-  deriv.m = c(1, 0, 0, 0)
-  deriv.s2 = c(0, 2 * param[2] * exp(x), 0, 0)
+  deriv.m = rep(1, length(param)) %*% t(as.matrix(c(1, 0, 0, 0)))
+  deriv.s2 = rep(1, length(param)) %*% t(as.matrix(c(0, 2 * param[2] * exp(x), 0, 0)))
   return(-0.5 * deriv.s2 / s2                   # -0.5 * log(s2)
          + 0.5 * deriv.s2 * (y - m)**2 / s2**2  # -0.5 * (y - m)**2 / s2 (w.r.t. s2)
          + deriv.m * (y - m) / s2)              # -0.5 * (y - m)**2 / s2 (w.r.t. m)
