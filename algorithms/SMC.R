@@ -43,37 +43,7 @@ particle.filter = function(N, Nth, y, param) {
     w[t,] = step$weights
     t = t + 1
   }
-  res.list = list("particles"=part, "weights"=w)
-  return(res.list)
-}
-
-info.particle.filter = function(N, Nth, y, param) {
-  # Particle filter with computation of score and observed information.
-  T = length(y)
-  d = length(param)
-  score = array(0, c(T, d))
-  info = array(0, c(T, d, d))
-  init = info.particle.filter.init(N, y[1], param)
-  part = init$particles
-  w = init$weights
-  alpha = init$alpha
-  beta = init$beta
-  scorinfo = score.info(w, alpha, beta)
-  score[1,] = scorinfo$score
-  info[1,,] = scorinfo$info
-  t = 2
-  while (t <= T) {
-    step = info.particle.filter.step(N, Nth, y[t], part, w, alpha, beta, y[t-1], t, param)
-    part = step$particles
-    w = step$weights
-    alpha = step$alphas
-    beta = step$betas
-    scorinfo = score.info(w, alpha, beta)
-    score[t,] = scorinfo$score
-    info[t,,] = scorinfo$info
-    t = t + 1
-  }
-  return(list("scores"=score, "infos"=info))
+  return(list("particles"=part, "weights"=w))
 }
 
 particle.filter.init = function(N, y, param) {
@@ -84,22 +54,7 @@ particle.filter.init = function(N, y, param) {
   res.list = list("particles"=part, "weights"=w)
   return(res.list)
 }
-  
-info.particle.filter.init = function(N, y, param) {
-  # Initialization of particle filter with score and observed information.
-  d = length(param)
-  part = generate.init(N, param)
-  wei = exp(observation.log.pdf(y, part, 1, param))
-  alpha = array(0, c(N, d))
-  beta = array(0, c(N, d, d))
-  for (i in 1:N) {
-    alpha[i,] = deriv.observation.log.pdf(y, part[i], 1, param) + deriv.init.log.pdf(part[i], param)
-    beta[i,,] = deriv2.observation.log.pdf(y, part[i], 1, param) + deriv2.init.log.pdf(part[i], param)
-  }
-  w = normalize.weights(wei, rep(1/N, N))  
-  return(list("particles"=part, "weights"=w, "alphas"=alpha, "betas"=beta))
-}
- 
+
 particle.filter.step = function(N, Nth, y, part, w, yprev, t.index, param) {
   # One particle filter step.
   Neff = 1 / sum(w**2)
@@ -116,6 +71,52 @@ particle.filter.step = function(N, Nth, y, part, w, yprev, t.index, param) {
   return(res.list)
 }
 
+info.particle.filter = function(N, Nth, y, param) {
+  # Particle filter with computation of score and observed information.
+  T = length(y)
+  d = length(param)
+  part = matrix(0, T, N)
+  w = matrix(0, T, N)
+  score = matrix(0, T, d)
+  info = array(0, c(T, d, d))
+  init = info.particle.filter.init(N, y[1], param)
+  part[1,] = init$particles
+  w[1,] = init$weights
+  alpha = init$alpha
+  beta = init$beta
+  scorinfo = score.info(w[1,], alpha, beta)
+  score[1,] = scorinfo$score
+  info[1,,] = scorinfo$info
+  t = 2
+  while (t <= T) {
+    step = info.particle.filter.step(N, Nth, y[t], part[t-1,], w[t-1,], alpha, beta, y[t-1], t, param)
+    part[t,] = step$particles
+    w[t,] = step$weights
+    alpha = step$alphas
+    beta = step$betas
+    scorinfo = score.info(w[t,], alpha, beta)
+    score[t,] = scorinfo$score
+    info[t,,] = scorinfo$info
+    t = t + 1
+  }
+  return(list("particles"=part, "weights"=w, "scores"=score, "infos"=info))
+}
+
+info.particle.filter.init = function(N, y, param) {
+  # Initialization of particle filter with score and observed information.
+  d = length(param)
+  part = generate.init(N, param)
+  wei = exp(observation.log.pdf(y, part, 1, param))
+  alpha = array(0, c(N, d))
+  beta = array(0, c(N, d, d))
+  for (i in 1:N) {
+    alpha[i,] = deriv.observation.log.pdf(y, part[i], 1, param) + deriv.init.log.pdf(part[i], param)
+    beta[i,,] = deriv2.observation.log.pdf(y, part[i], 1, param) + deriv2.init.log.pdf(part[i], param)
+  }
+  w = normalize.weights(wei, rep(1/N, N))  
+  return(list("particles"=part, "weights"=w, "alphas"=alpha, "betas"=beta))
+}
+ 
 info.particle.filter.step = function(N, Nth, y, partprev, wprev, alphaprev, betaprev, yprev, t.index, param) {
   # One step of particle filter with score and observed information.
   d = length(param)
@@ -152,13 +153,72 @@ info.particle.filter.step = function(N, Nth, y, partprev, wprev, alphaprev, beta
   return(list("particles"=part, "weights"=w, "alphas"=alpha, "betas"=beta))
 }
 
-score.info = function(w, alpha, beta) {
+score.particle.filter = function(N, Nth, y, param) {
+  # Particle filter with computation of score.
+  T = length(y)
+  d = length(param)
+  part = matrix(0, T, N)
+  w = matrix(0, T, N)
+  score = array(0, c(T, d))
+  init = score.particle.filter.init(N, y[1], param)
+  part[1,] = init$particles
+  w[1,] = init$weights
+  alpha = init$alpha
+  score[1,] = w[1,] %*% alpha
+  t = 2
+  while (t <= T) {
+    step = score.particle.filter.step(N, Nth, y[t], part[t-1,], w[t-1,], alpha, y[t-1], t, param)
+    part[t,] = step$particles
+    w[t,] = step$weights
+    alpha = step$alphas
+    score[t,] = w[t,] %*% alpha
+    t = t + 1
+  }
+  return(list("particles"=part, "weights"=w, "scores"=score))
+}
+
+score.particle.filter.init = function(N, y, param) {
+  # Initialization of particle filter with score.
+  d = length(param)
+  part = generate.init(N, param)
+  wei = exp(observation.log.pdf(y, part, 1, param))
+  alpha = deriv.observation.log.pdf(y, part, 1, param) + deriv.init.log.pdf(part, param)
+  w = normalize.weights(wei, rep(1/N, N))
+  return(list("particles"=part, "weights"=w, "alphas"=alpha))
+}
+
+score.particle.filter.step = function(N, Nth, y, partprev, wprev, alphaprev, yprev, t.index, param) {
+  # One step of particle filter with score.
+  d = length(param)
+  Neff = 1 / sum(wprev**2)
+  if (Neff <= Nth) {
+    resampidx = sample.int(N, N, replace=TRUE, prob=wprev)
+    part = generate.kernel(partprev[resampidx], yprev, t.index, param)
+    wei = exp(observation.log.pdf(y, part, t.index, param))
+  } else {
+    part = generate.kernel(partprev, yprev, t.index, param)
+    wei = wprev * exp(observation.log.pdf(y, part, t.index, param))
+  }
+  w = normalize.weights(wei, w)
+  alpha = matrix(0, N, d)
+  kernel = exp(kernel.log.pdf(partprev, part, NULL, t.index, param))
+  for (i in 1:N) {
+    alpha[i,] = colSums(((wprev * kernel[,i]) %*% matrix(1, 1, d)) * 
+      (matrix(1, N, 1) %*% deriv.observation.log.pdf(y, part[i], t.index, param) +
+         deriv.kernel.log.pdf(partprev, part[i], NULL, t.index, param) + alphaprev)) /
+           c(wprev %*% kernel[,i])
+  }
+  
+  return(list("particles"=part, "weights"=w, "alphas"=alpha))
+}
+
+compute.score.info = function(weights, alphas, betas) {
   # Compute score and observed information.
-  N = length(w)
-  score = t(w) %*% alpha
+  N = length(weights)
+  score = t(weights) %*% alphas
   info = t(score) %*% score
   for (i in 1:N) {
-    info = info + w[i] * (alpha[i,] %*% t(alpha[i,]) + beta[i,,])
+    info = info + weights[i] * (alphas[i,] %*% t(alphas[i,]) + betas[i,,])
   }
   return(list("score"=score, "info"=info))
 }
@@ -276,20 +336,21 @@ run.experiment.SV = function(N, Nth, h, param.init, param.inf, param.sup, T.trai
   # initial model fit
   print('model initial fit')
   em = EM.algo(y[1:t], param.init, param.inf, param.sup, N, Nth, maxiter.init, tol)
-  param = em$param
+  new.param = em$param
   last.fit = 0
   
-  # # parameter estimates and their std 
-  # info.filter = info.particle.filter(N, Nth, y, param)
-  # info = info.filter$infos[t,,]
-
   # initial particle filter
-  filter = particle.filter(N, Nth, y[1:t], param)
+  filter = info.particle.filter(N, Nth, y[1:t], new.param)
   part = filter$particles[t,]
   w = filter$weights[t,]
 
   # initial forecast
-  y.part = particle.forecast(N, part, w, h, y[1:t], NULL, param)
+  y.part = particle.forecast(N, part, w, h, y[1:t], NULL, new.param)
+  
+  # initial parameter
+  param = new.param
+  print(filter$score[t,])
+  print(filter$infos[t,,])
 
   while (t < T - h) {
 
@@ -300,23 +361,32 @@ run.experiment.SV = function(N, Nth, h, param.init, param.inf, param.sup, T.trai
     # re-fit model
     if (last.fit == fit.period) {
       print('model re-fit')
-      em = EM.algo(y[(t-T.train):t], param, param.inf, param.sup, N, Nth, maxiter, tol)
-      param = em$param
+      em = EM.algo(y[(t-T.train):t], new.param, param.inf, param.sup, N, Nth, maxiter, tol)
+      new.param = em$param
+      filter = info.particle.filter(N, Nth, y[1:t], new.param)
+      part = filter$particles[t,]
+      w = filter$weights[t,]
+      info = filter$infos[t,,]
       last.fit = 0
       
+      print(filter$score[t,])
+      print(filter$infos[t,,])
     }
 
     # observe new datapoint & particle filter step
-    filter = particle.filter.step(N, Nth, y[t], part, w, y[t-1], NULL, param)
+    filter = particle.filter.step(N, Nth, y[t], part, w, y[t-1], NULL, new.param)
     part = filter$particles
     w = filter$weights
 
     # forecast
-    y.part = rbind(y.part, particle.forecast(N, part, w, h, y[t], NULL, param))
+    y.part = rbind(y.part, particle.forecast(N, part, w, h, y[t], NULL, new.param))
+    
+    # parameter
+    param = rbind(param, new.param)
 
   }
 
-  return(y.part)
+  return(list("observation.particles"=y.part, "parameter"=param))
 }
 
 forecast.statistics = function(y, y.part) {

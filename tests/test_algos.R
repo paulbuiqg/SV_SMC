@@ -21,16 +21,16 @@ plot(y, type="l")
 ## test SMC ##
 
 # filter = particle.filter(100, 66, y, param.test)
-# x.filt = rowSums(filter$particles * filter$weights)
-# 
+# filter = info.particle.filter(100, 66, y, param.test)
+filter = score.particle.filter(100, 66, y, param.test)
+x.filt = rowSums(filter$particles * filter$weights)
+ 
 # smoother = particle.smoother(filter$weights, filter$particles, y, param.test)
 # x.smooth = rowSums(filter$particles * smoother$weights)
-# 
-# plot(x, type="l")
-# lines(x.filt, col='blue')
+ 
+plot(x, type="l")
+lines(x.filt, col='blue')
 # lines(x.smooth, col='green')
-
-filter = info.particle.filter(100, 66, y, param.test)
 
 ## test parameter estimation ##
 # param.init = initialize.parameters(y)
