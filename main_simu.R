@@ -11,6 +11,7 @@ path.algo = paste(path, 'algorithms', sep='')
 source(paste(path.model, 'bench.R', sep='/'))
 source(paste(path.algo, 'SMC.R', sep='/'))
 source(paste(path.algo, 'EM.R', sep='/'))
+source(paste(path.algo, 'experiments.R', sep='/'))
 
 n.xp = 100
 T = 1000
