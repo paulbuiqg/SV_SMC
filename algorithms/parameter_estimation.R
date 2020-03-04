@@ -3,6 +3,7 @@ batch_parameter_estimation = function(N, Nth, y, thres, maxiter=100) {
   last.param = initialize.parameters(y)
   params = param
   iter = 0
+  rate = thres + 1
   while (rate > thres & iter < maxiter) {
     filter = info.particle.filter(N, Nth, y, last.param)
     scorinfo = compute.score.info(filter$weights, filter$alphas, filter$betas)
