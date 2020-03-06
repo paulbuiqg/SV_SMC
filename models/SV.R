@@ -10,22 +10,22 @@ param.sup = c(Inf, Inf, 0.999, Inf)
 
 generate.init = function(N, param) {
   # Generate initial state.
-  init = param[4] / sqrt(1 - param[3]**2) * rnorm(N, 0, 1)
+  init = param[4] / sqrt(abs(1 - param[3]**2)) * rnorm(N, 0, 1)
   return(init)
 }
 
 init.log.pdf = function(x, param) {
   # Pdf of initial state.
   m = 0
-  s2 = param[4]**2 / (1 - param[3]**2)
+  s2 = param[4]**2 / (abs(1 - param[3]**2))
   return(-0.5 * log(s2) - 0.5 * (x - m)**2 / s2)
 }
 
 deriv.init.log.pdf = function(x, param) {
   # Derivative of initial state pdf.
   m = 0
-  s2 = param[4]**2 / (1 - param[3]**2)
-  deriv.s2 = rep(1, length(x)) %*% t(as.matrix(c(0, 0, 2 * param[3] * param[4]**2 / (1 - param[3]**2)**2, 2 * param[4] / (1 - param[3]**2))))
+  s2 = param[4]**2 / (abs(1 - param[3]**2))
+  deriv.s2 = rep(1, length(x)) %*% t(as.matrix(c(0, 0, 2 * param[3] * param[4]**2 / (abs(1 - param[3]**2))**2, 2 * param[4] / (abs(1 - param[3]**2)))))
   return(-0.5 * deriv.s2 / s2                   # -0.5 * log(s2)
          + 0.5 * deriv.s2 * (x - m)**2 / s2**2  # -0.5 * (x - m)**2 / s2)
   )
@@ -34,12 +34,12 @@ deriv.init.log.pdf = function(x, param) {
 deriv2.init.log.pdf = function(x, param) {
   # 2nd derivative of initial state pdf.
   m = 0
-  s2 = param[4]**2 / (1 - param[3]**2)
-  deriv.s2 = matrix(c(0, 0, 2 * param[3] * param[4]**2 / (1 - param[3]**2)**2, 2 * param[4] / (1 - param[3]**2)), nrow=1)
+  s2 = param[4]**2 / (abs(1 - param[3]**2))
+  deriv.s2 = matrix(c(0, 0, 2 * param[3] * param[4]**2 / (abs(1 - param[3]**2))**2, 2 * param[4] / (abs(1 - param[3]**2))), nrow=1)
   deriv2.s2 = matrix(c(0, 0, 0, 0,
                        0, 0, 0, 0,
-		          			   0, 0, 2 * param[4]**2 / (1 - param[3]**2)**2 + 8 * param[3]**2 * param[4]**2 / (1 - param[3]**2)**3, 4 * param[3] * param[4] / (1 - param[3]**2)**2,
-					             0, 0, 4 * param[3] * param[4] / (1 - param[3]**2)**2, 2 / (1 - param[3]**2)), nrow=4)
+		          			   0, 0, 2 * param[4]**2 / (abs(1 - param[3]**2))**2 + 8 * param[3]**2 * param[4]**2 / (abs(1 - param[3]**2))**3, 4 * param[3] * param[4] / (abs(1 - param[3]**2))**2,
+					             0, 0, 4 * param[3] * param[4] / (abs(1 - param[3]**2))**2, 2 / (abs(1 - param[3]**2))), nrow=4)
   return(-0.5 * deriv2.s2 / s2 + 0.5 * t(deriv.s2) %*% deriv.s2 / s2**2                           # -0.5 * deriv.s2 / s2
          + 0.5 * deriv2.s2 * (x - m)**2 / s2**2 - t(deriv.s2) %*% deriv.s2 * (x - m)**2 / s2**3)  # 0.5 * deriv.s2 * (x - m)**2 / s2**2
 }
