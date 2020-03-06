@@ -54,21 +54,21 @@ EM.algo = function(y, param.init, param.inf, param.sup, N, Nth, maxiter, tol) {
   return(list("param.seq"=param.seq, "param"=param))
 }
 
-
 gradient.descent.estimation = function(N, Nth, y, param.init, thres=.001, maxiter=100) {
   # Search zero of the likelihood gradient (score).
+  # Not working with bounded parameters.
   T = length(y)
   param = param.init
   param.seq = c(param)
   iter = 1
   r = thres + 10
   while (r > thres & iter < maxiter) {
+    print(sprintf('- Gradient descent | iteration %i', iter))
     iter = iter + 1
     score = score.particle.filter(N, Nth, y, param)$scores[T,]
     param = param - (1 / iter)**(2 / 3) * score
     param.seq = cbind(param.seq, param)
     r = sqrt(sum((param.seq[,iter] - param.seq[,iter - 1])**2) / sum(param.seq[,iter - 1]**2))
-    print(sprintf('- Gradient descent | iteration %i', iter))
   }
   return(list("param.seq"=param.seq, "param"=param))
 }
