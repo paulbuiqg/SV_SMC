@@ -8,7 +8,7 @@ path.algo = paste(path, 'algorithms/', sep='')
 
 source(paste(path.model, 'SV.R', sep=''))
 source(paste(path.algo, 'SMC.R', sep=''))
-source(paste(path.algo, 'EM.R', sep=''))
+source(paste(path.algo, 'parameter_estimation.R', sep=''))
 
 ## simulate data ##
 
@@ -22,16 +22,21 @@ plot(y, type="l")
 
 # filter = particle.filter(100, 66, y, param.test)
 # filter = info.particle.filter(100, 66, y, param.test)
-filter = score.particle.filter(100, 66, y, param.test)
-x.filt = rowSums(filter$particles * filter$weights)
- 
+# filter = score.particle.filter(100, 66, y, param.test)
+# x.filt = rowSums(filter$particles * filter$weights)
+
 # smoother = particle.smoother(filter$weights, filter$particles, y, param.test)
 # x.smooth = rowSums(filter$particles * smoother$weights)
  
-plot(x, type="l")
-lines(x.filt, col='blue')
+# plot(x, type="l")
+# lines(x.filt, col='blue')
 # lines(x.smooth, col='green')
 
 ## test parameter estimation ##
-# param.init = initialize.parameters(y)
-# EM = EM.algo(y, param.init, param.inf, param.sup, 50, 33, 200, .001)
+
+param.init = initialize.parameters(y)
+
+em = EM.algo(y, param.init, param.inf, param.sup, 50, 33, 200, .001)
+
+# est = gradient.descent.estimation(100, 66, y, param.init, .001)
+
