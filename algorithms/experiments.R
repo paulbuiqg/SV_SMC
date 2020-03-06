@@ -60,7 +60,6 @@ run.experiment.sv = function(N, Nth, h, T.train, y, param.init, param.inf, param
   
   # initial model fit
   print('model initial fit')
-  # est = gradient.descent.estimation(N, Nth, y[1:t], tol)
   est = EM.algo(y[1:t], param.init, param.inf, param.sup, N, Nth, maxiter.init, tol)
   new.param = est$param
   last.fit = 0
@@ -84,7 +83,6 @@ run.experiment.sv = function(N, Nth, h, T.train, y, param.init, param.inf, param
     # re-fit model
     if (last.fit == fit.period) {
       print('model re-fit')
-      # est = gradient.descent.estimation(N, Nth, y[(t-T.train):t], tol)
       est = EM.algo(y[(t-T.train):t], new.param, param.inf, param.sup, N, Nth, maxiter, tol)
       new.param = est$param
       last.fit = 0
