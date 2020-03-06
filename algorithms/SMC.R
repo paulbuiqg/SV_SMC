@@ -129,7 +129,7 @@ info.particle.filter.step = function(N, Nth, y, partprev, wprev, alphaprev, beta
     part = generate.kernel(partprev, yprev, t.index, param)
     wei = wprev * exp(observation.log.pdf(y, part, t.index, param))
   }
-  w = normalize.weights(wei, w)
+  w = normalize.weights(wei, wprev)
   alpha = array(0, c(N, d))
   beta = array(0, c(N, d, d))
   for (i in 1:N) {
@@ -159,7 +159,7 @@ score.particle.filter = function(N, Nth, y, param) {
   d = length(param)
   part = matrix(0, T, N)
   w = matrix(0, T, N)
-  score = array(0, c(T, d))
+  score = matrix(0, T, d)
   init = score.particle.filter.init(N, y[1], param)
   part[1,] = init$particles
   w[1,] = init$weights
@@ -199,7 +199,7 @@ score.particle.filter.step = function(N, Nth, y, partprev, wprev, alphaprev, ypr
     part = generate.kernel(partprev, yprev, t.index, param)
     wei = wprev * exp(observation.log.pdf(y, part, t.index, param))
   }
-  w = normalize.weights(wei, w)
+  w = normalize.weights(wei, wprev)
   alpha = matrix(0, N, d)
   kernel = exp(kernel.log.pdf(partprev, part, NULL, t.index, param))
   for (i in 1:N) {
