@@ -51,7 +51,8 @@ run.experiment = function(N, Nth, T, h, param) {
   return(res.list)
 }
 
-run.experiment.SV = function(N, Nth, h, param.init, param.inf, param.sup, T.train, y, maxiter.init, maxiter, tol, fit.period) {
+run.experiment.sv = function(N, Nth, h, T.train, y, param.init, param.inf, param.sup,
+                             maxiter.init, maxiter, tol, fit.period) {
   # Run experiment with real data.
   
   T = length(y)
@@ -59,12 +60,13 @@ run.experiment.SV = function(N, Nth, h, param.init, param.inf, param.sup, T.trai
   
   # initial model fit
   print('model initial fit')
-  em = EM.algo(y[1:t], param.init, param.inf, param.sup, N, Nth, maxiter.init, tol)
-  new.param = em$param
+  # est = gradient.descent.estimation(N, Nth, y[1:t], tol)
+  est = EM.algo(y[1:t], param.init, param.inf, param.sup, N, Nth, maxiter.init, tol)
+  new.param = est$param
   last.fit = 0
   
   # initial particle filter
-  filter = info.particle.filter(N, Nth, y[1:t], new.param)
+  filter = particle.filter(N, Nth, y[1:t], new.param)
   part = filter$particles[t,]
   w = filter$weights[t,]
   
@@ -72,29 +74,22 @@ run.experiment.SV = function(N, Nth, h, param.init, param.inf, param.sup, T.trai
   y.part = particle.forecast(N, part, w, h, y[1:t], NULL, new.param)
   
   # initial parameter
-  param = new.param
-  print(filter$score[t,])
-  print(filter$infos[t,,])
+  params = new.param
   
   while (t < T - h) {
     
     t = t + 1
-    last.fit = last.fit + 1
     print(sprintf('time %i', t))
     
     # re-fit model
     if (last.fit == fit.period) {
       print('model re-fit')
-      em = EM.algo(y[(t-T.train):t], new.param, param.inf, param.sup, N, Nth, maxiter, tol)
-      new.param = em$param
-      filter = info.particle.filter(N, Nth, y[1:t], new.param)
-      part = filter$particles[t,]
-      w = filter$weights[t,]
-      info = filter$infos[t,,]
+      # est = gradient.descent.estimation(N, Nth, y[(t-T.train):t], tol)
+      est = EM.algo(y[(t-T.train):t], new.param, param.inf, param.sup, N, Nth, maxiter, tol)
+      new.param = est$param
       last.fit = 0
-      
-      print(filter$score[t,])
-      print(filter$infos[t,,])
+    } else {
+      last.fit = last.fit + 1
     }
     
     # observe new datapoint & particle filter step
@@ -106,11 +101,11 @@ run.experiment.SV = function(N, Nth, h, param.init, param.inf, param.sup, T.trai
     y.part = rbind(y.part, particle.forecast(N, part, w, h, y[t], NULL, new.param))
     
     # parameter
-    param = rbind(param, new.param)
+    params = rbind(params, new.param)
     
   }
   
-  return(list("observation.particles"=y.part, "parameter"=param))
+  return(list("observation.particles"=y.part, "param.seq"=param.seq))
 }
 
 forecast.statistics = function(y, y.part) {

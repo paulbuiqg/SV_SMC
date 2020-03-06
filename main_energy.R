@@ -30,9 +30,9 @@ library(zoo)
 ### settings ###
 
 path = paste(getwd(), '/', sep='')
-model = 'ASV'
-freq = 'day'
-asset = 'WTI'
+model = 'SV'
+freq = 'month'
+asset = 'Brent'
 
 # out-of-sample starting time
 start.out = as.POSIXct('2000-01-01', origin='1970-01-01', tz='GMT')
@@ -53,7 +53,8 @@ path.data = paste(path, 'data/', sep='')
 
 # EM & SMC function loading
 source(paste(path.algo, 'SMC.R', sep=''))
-source(paste(path.algo, 'EM.R', sep=''))
+source(paste(path.algo, 'parameter_estimation.R', sep=''))
+source(paste(path.algo, 'experiments.R', sep=''))
 
 # model loading
 source(paste(path.model, model, '.R', sep=''))
@@ -98,8 +99,8 @@ j = which(attr(data, 'dimnames')[[2]] == asset)
 # model fitting, particle forecasting
 series = coredata(data.0[,j])
 param.init = initialize.parameters(series)
-series.forecast = run.experiment.SV(N, Nth, 1, param.init, param.inf, param.sup,
-                                    T.train, series, maxiter.init, maxiter, tol, fit.period)
+series.forecast = run.experiment.sv(N, Nth, 1, T.train, series, param.init, param.inf, param.sup,
+                                    maxiter.init, maxiter, tol, fit.period)
   
 # PIT, VaR, ES
 stats = forecast.statistics(series[index(data.0) >= min(forecast.index)], series.forecast)
